@@ -1,112 +1,17 @@
 
 
-# Project： Rabbit(Tuzi)
+# Project： Orange
 
-[![GitHub forks](https://img.shields.io/github/forks/hunterhug/rabbit.svg?style=social&label=Forks)](https://github.com/hunterhug/rabbit/network)
-[![GitHub stars](https://img.shields.io/github/stars/hunterhug/rabbit.svg?style=social&label=Stars)](https://github.com/hunterhug/rabbit/stargazers)
-[![GitHub last commit](https://img.shields.io/github/last-commit/hunterhug/rabbit.svg)](https://github.com/hunterhug/rabbit)
-[![Go Report Card](https://goreportcard.com/badge/github.com/hunterhug/rabbit)](https://goreportcard.com/report/github.com/hunterhug/rabbit)
-[![GitHub issues](https://img.shields.io/github/issues/hunterhug/rabbit.svg)](https://github.com/hunterhug/rabbit/issues)
-[![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/hunterhug/rabbit/master/LICENSE)
-[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu) 
-[![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
+对照着beego上面示例网站写出来的一个网站(github.com/hunterhug/rabbit).
 
-请看: [中文介绍](doc/Chinese.md)
+## 1. 介绍
 
-You can own a enterprise web just listen to me! You just need install golang environment(ask for google help).Under developing...
+1. 基本的登录(需要验证码), cookie记住登录功能
+2. 权限认证功能(基于RBAC), 有友好的后台操作界面, 可以进行角色性的功能授权, 用户管理
+3. 支持基本的文章(可置顶,指定排序), 富文本编辑, 有回收站功能. 相册功能, 可上传文件, 类似文章功能
+4. 前端支持轮转图, 首页配置灵活, 可配置统计代码, 跟帖代码等
+5. beego框架, maze UI v2.7.0（部分后台）和jQuery EasyUI v1.4.2（后台表格CRUD）、Bootstrap v3.3.5（前台）混合 sqlites3(以前是mysql)
 
-![Rabbit](tuzi.png)
-
-## 1. How to use
-
-Go1.9+ Must!
-
-Just do this:
-
-```shell
-go get -v github.com/hunterhug/rabbit
-```
-
-Or
-
-```
-git clone https://www.github.com/hunterhug/rabbit
-mkdir -p %GOPATH%/src/github.com/hunterhug
-mv rabbit %GOPATH%/src/github.com/hunterhug
-```
-
-this  `%GOPATH%` is your `GOPATH`。
-
-Then build our web
-
-```shell
-go build
-```
-
-Before run, Please config the db set in `conf/app.conf`, use Mysql.
-
-```
-# you can set it into prod when in production environment
-runmode = dev
-
-[dev]
-httpport = 8080
-db_host = 127.0.0.1
-db_port = 3306
-db_user = root
-db_pass = 123456789
-db_name = tuzi
-db_type = mysql
-
-[prod]
-EnableGzip = true
-httpport = 80
-db_host = 127.0.0.1
-db_port = 3306
-db_user = root
-db_pass = 123456789
-db_name = tuzi
-db_type = mysql
-```
-
-How to install `Mysql` quickly:
-
-```
-git clone https://github.com/hunterhug/GoSpider-docker
-cd GoSpider-docker
-chomd 777 build.sh
-./build
-
-sudo docker exec -it  GoSpider-mysqldb mysql -uroot -p123456789
-
-> create database tuzi default character set utf8mb4 collate utf8mb4_unicode_ci;
-
-sudo docker exec -it GoSpider-redis redis-cli -a 123456789
-
-> KEYS *
-```
-
-And init our database:
-
-```shell
-./rabbit -db=1
-```
-
-Last run it:
-
-```shell
-./rabbit
-```
-
-Ok, you can open `http://127.0.0.1:8080`, Login to edit the website: `http://127.0.0.1:8080/public/login`, User: `admin`, Password：`admin`
-
-if upload file error please make a new dir names `file` under this project: 
-
-```
-# if in linux
-mkdir file
-chmod 777 file
-```
 
 ## 2. How to Develop
 
@@ -155,23 +60,16 @@ chmod 777 file
         --- ngnix-tuzi.conf Nginx config
 ```
 
-We have already implement basic RBAC module and Blog module（Article and Album equal to enterprise News and Production）, And have a Dashboard back-end UI, The UI can accelerated development.
+### b. 详情
 
-1. Role-Based Access Control
-2. Amaze UI v2.7.0（little back-end）和jQuery EasyUI v1.4.2（back-end table CRUD）、Bootstrap v3.3.5（front-end）mixed
-3. Prepare use Vue.js v2.2.6 to separate back-end and front-end（Maybe）, back-end just offer REST JSON API, and front-end can first test Off-line then if no problem, docking!
-when ajax call JSON must pay attention across-domain rule(see rht dir front), why use this way due to can reduce the back-end burden~~ and more fast develop...
-
-### b. Rules And Explanation
-
-1. RBAC function must put in `controllers/admin` folder.Front-end controllers put in `controllers/home` folder, other put in `controllers/admin`.URL router use `M/C/A` ways, such router  `rbac/public/index`（three）must authorize.
-2. Login：you can logout after login, support cookie remember login. when enter back-end, check session, if not exist session then check cookie. if user is activated, add the session, record login times、login IP etcd. When remember login, will add cookie(cooke bind by ip and encrypted password for hijacking prevention).
-3. System time default timezone UTC/GMT+08:00 China BeiJin, you can change in `app.conf`.
-4. Back-end template in `views/admin`, front-end in `views/home`, the sub folder is theme, which default is default... can change in `app.conf`.
-5. All config in `conf/app.conf`, support internationalization, can use chinese/english by browser such `Accept-Language:en-US,en;q=0.5` 
-6. All data initialization can define in `models/*/*Init.go`, I will change it all in english.
-7. All js/css such static file must put in `static`
-8. Website home can be change by this（just ignore it...waiting for explanation）
+1. RBAC权限相关的models统一放在admin文件夹,其他都放在home文件夹.前台控制相关的controllers统一放在home文件夹,其他都放在admin文件夹.URL router统一M/C/A方式,该正则url需要验证权限如rbac/public/index（三个参数）,其他如public/index不验证.
+2. 登录说明：登陆过的用户只能注销后登录，支持定义cookie登录.进入后台时验证session,session不存在则验证cookie.如果用户未被冻结,增加session,同时更改用户登录时间、登录IP等.cookie与登录IP绑定（防止cookie劫持）.
+3. 系统时间默认数据库本地时间为东八区北京时间.
+4. 后台模板在views/admin前台模板在views/home子文件夹为主题默认主题为default
+5. 所有配置在conf文件夹conf/app.conf支持国际化 
+6. 数据库数据填充在models/*/*Init.go中定义， 我准备将所有中文变成英文
+7. 各种前端文件全部放在static中
+8. 前台首页配置
 
 ```
 {
@@ -184,79 +82,12 @@ when ajax call JSON must pay attention across-domain rule(see rht dir front), wh
 }
 ```
 
-### c. Add routers and permissions
-
-Every add routers and permissions in `models/admin/AdminInit.go`, please rebuild rbac:
-
-```
-./rabbit -rbac=1
-```
-
-debug you can use `bee run`...
-
-## 3. How to use Nginx(optional)
-
-First install Nginx(ask for google...), Ubuntu do this: `sudo apt-get install nginx`
-
-Enter `/etc/nginx/conf.d`, put our `doc/sh/ngnix-tuzi.conf` under it, which config `ngnix-tuzi.conf`, `server_name` is your domain, `access_log` is the log path（you must make dir first）
-
-```shell
-server{
-        listen 80;
-        server_name tuzi.lenggirl.com;
-        charset utf-8;
-        access_log /data/logs/nginx/tuzi.lenggirl.com.log;
-        #error_log /data/logs/nginx/tuzi.lenggirl.com.err;
-        location / {
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $http_host;
-        proxy_redirect off;
-        proxy_pass http://localhost:8080;
-	    proxy_set_header X-Real-Ip $remote_addr;
-        }
-
-}
-```
-
-Then:
-
-```
-nginx -t
-nginx -s reload
-curl tuzi.lenggirl.com
-```
-# More
-
-Just for debug home!
-
-```
-go run main.go  -config=conf/tuzi.conf -home=home/first
-```
-
 # Have a Look!
 
-![](doc/img/index.png)
+![](doc/img/index1.png)
 
-![](doc/img/blog.png)
+![](doc/img/admin1.png)
 
-![](doc/img/pic.png)
+![](doc/img/login1.png)
 
-# LICENSE
-
-```
-Copyright 2017 by rabbit author: gdccmcm14@live.com.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License
-```
-
-Welcome Add PR/issues.
-
-For questions, please email: gdccmcm14@live.com.
 
